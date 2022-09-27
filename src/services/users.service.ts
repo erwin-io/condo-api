@@ -221,7 +221,7 @@ export class UsersService {
         where: {
           user: options,
         },
-        relations: ["user", "gender", "pets"],
+        relations: ["user", "gender"],
       });
       result.fullName =
         result.firstName +

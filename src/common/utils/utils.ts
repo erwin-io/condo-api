@@ -43,8 +43,6 @@ export const getAge = async (birthDate: Date) => {
 
 export const isStaffRegistrationApproved = (roleId: number): boolean => {
   if (roleId === RoleEnum.ADMIN) return true;
-  else if (roleId === RoleEnum.MANAGER) return true;
-  else if (roleId === RoleEnum.VET) return true;
   else if (roleId === RoleEnum.FRONTDESK) return true;
   else return false;
 };
