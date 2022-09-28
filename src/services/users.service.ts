@@ -31,6 +31,7 @@ import { TenantViewModel } from "src/core/view-model/tenant.view-model";
 import { UserViewModel } from "src/core/view-model/user.view-model";
 import { query } from "express";
 import { UserTypeEnum } from "src/common/enums/user-type.enum";
+import { Rooms } from "src/shared/entities/Rooms";
 
 @Injectable()
 export class UsersService {
@@ -221,7 +222,7 @@ export class UsersService {
         where: {
           user: options,
         },
-        relations: ["user", "gender"],
+        relations: ["user", "gender", "room"],
       });
       result.fullName =
         result.firstName +
@@ -393,6 +394,9 @@ export class UsersService {
       tenant.age = (await getAge(userDto.birthDate)).toString();
       tenant.gender = new Gender();
       tenant.gender.genderId = userDto.genderId;
+      tenant.room = await entityManager.findOne(Rooms, {
+        where: { roomId: userDto.roomId },
+      });
       tenant = await entityManager.save(Tenant, tenant);
       tenant.user = await this._sanitizeUser(user);
 
@@ -461,6 +465,9 @@ export class UsersService {
       tenant.gender = new Gender();
       tenant.gender.genderId = userDto.genderId;
 
+      tenant.room = await entityManager.findOne(Rooms, {
+        where: { roomId: userDto.roomId },
+      });
       await entityManager.save(Tenant, tenant);
       tenant = await this.findOne({ userId }, true, entityManager);
 

@@ -96,4 +96,8 @@ export class TenantUserDto extends CreateUserDto {
 }
 
 export class CreateTenantUserDto extends TenantUserDto {
+
+  @ApiProperty()
+  @IsNotEmpty()
+  roomId: string;
 }

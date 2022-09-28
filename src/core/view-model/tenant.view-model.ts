@@ -1,5 +1,6 @@
 import { Tenant } from "src/shared/entities/Tenant";
 import { GenderViewModel } from "./gender.view-model";
+import { RoomViewModel } from "./room.view-model";
 import { UserViewModel } from "./user.view-model";
 
 export class TenantViewModel {
@@ -15,6 +16,7 @@ export class TenantViewModel {
   user: UserViewModel;
   birthDate: Date;
   age: string;
+  room: RoomViewModel;
   constructor(model: Tenant | undefined) {
     if (!model || model === null) {
       return null;
@@ -34,5 +36,6 @@ export class TenantViewModel {
     this.user = new UserViewModel(model.user);
     this.birthDate = model.birthDate;
     this.age = model.age;
+    this.room = new RoomViewModel(model.room);
   }
 }

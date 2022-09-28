@@ -4,10 +4,15 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { GuestMonitoring } from "./GuestMonitoring";
+import { IncidentsReports } from "./IncidentsReports";
+import { MonthlyDues } from "./MonthlyDues";
 import { Users } from "./Users";
 import { Gender } from "./Gender";
+import { Rooms } from "./Rooms";
 
 @Index("PK_Tenant", ["tenantId"], { unique: true })
 @Entity("Tenant", { schema: "dbo" })
@@ -39,6 +44,18 @@ export class Tenant {
   @Column("bigint", { name: "Age" })
   age: string;
 
+  @OneToMany(() => GuestMonitoring, (guestMonitoring) => guestMonitoring.tenant)
+  guestMonitorings: GuestMonitoring[];
+
+  @OneToMany(
+    () => IncidentsReports,
+    (incidentsReports) => incidentsReports.tenant
+  )
+  incidentsReports: IncidentsReports[];
+
+  @OneToMany(() => MonthlyDues, (monthlyDues) => monthlyDues.tenant)
+  monthlyDues: MonthlyDues[];
+
   @ManyToOne(() => Users, (users) => users.tenants)
   @JoinColumn([{ name: "UserId", referencedColumnName: "userId" }])
   user: Users;
@@ -46,4 +63,8 @@ export class Tenant {
   @ManyToOne(() => Gender, (gender) => gender.tenants)
   @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
   gender: Gender;
+
+  @ManyToOne(() => Rooms, (rooms) => rooms.tenants)
+  @JoinColumn([{ name: "RoomId", referencedColumnName: "roomId" }])
+  room: Rooms;
 }

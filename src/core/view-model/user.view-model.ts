@@ -1,3 +1,4 @@
+import { Users } from "src/shared/entities/Users";
 import { EntityStatusViewModel } from "./entity-status.view-model";
 import { RoleViewModel } from "./role.view-model";
 import { UserTypeViewModel } from "./user-type.view-model";
@@ -10,7 +11,7 @@ export class UserViewModel {
   entityStatus: EntityStatusViewModel;
   role: RoleViewModel;
   userType: UserTypeViewModel;
-  constructor(model: UserViewModel | undefined){
+  constructor(model: Users | undefined){
     if (!model || model === null) {
       return null;
     }

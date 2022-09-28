@@ -96,4 +96,8 @@ export class UpdateTenantUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
   genderId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  roomId: string;
 }
