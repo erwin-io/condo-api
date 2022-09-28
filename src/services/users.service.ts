@@ -323,6 +323,9 @@ export class UsersService {
       tenant.address = userDto.address;
       tenant.gender = new Gender();
       tenant.gender.genderId = userDto.genderId;
+      tenant.room = await entityManager.findOne(Rooms, {
+        where: { roomId: userDto.roomId },
+      });
       tenant = await entityManager.save(Tenant, tenant);
       tenant.user = await this._sanitizeUser(user);
       return tenant;

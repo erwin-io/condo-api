@@ -25,19 +25,22 @@ export class MonthlyDuesService {
     private readonly monthlyDuesRepo: Repository<MonthlyDues>
   ) {}
 
-  async find(year: number) {
+  async find(tenantId: string, year: number) {
     try {
-      const start = new Date(year, 1, 1);
-      const lastDay = new Date(year, 12 + 1, 0);
+      const start = new Date(year, 1, 0);
+      const lastDay = new Date(year, 12, 0);
 
       const param = {
+        tenantId,
         start,
         lastDay,
       };
       return <MonthlyDuesViewModel[]>(
         await this.monthlyDuesRepo.manager
           .createQueryBuilder("MonthlyDues", "md")
-          .where("md.dueDate between :start and :lastDay")
+          .leftJoinAndSelect("md.tenant", "t")
+          .where("t.tenantId = :tenantId")
+          .andWhere("md.dueDate between :start and :lastDay")
           .setParameters(param)
           .orderBy("md.dueDate", "DESC")
           .getMany()

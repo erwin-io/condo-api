@@ -25,12 +25,16 @@ import { MonthlyDuesService } from "src/services/monthly-dues.service";
 export class MonthlyDuesController {
   constructor(private readonly monthlyDuesService: MonthlyDuesService) {}
   @Get()
-  // @UseGuards(JwtAuthGuard)
-  @ApiQuery({ name: "year", required: false })
-  async findAll(@Query("year") year?) {
+  // @UseGuards(JwtAuthGuard) 
+  @ApiQuery({ name: "tenantId", required: true })
+  @ApiQuery({ name: "year", required: true })
+  async findAll(@Query("tenantId") tenantId, @Query("year") year) {
     const res: CustomResponse = {};
     try {
-      res.data = await this.monthlyDuesService.find(year);
+      res.data = await this.monthlyDuesService.find(
+        tenantId ? tenantId : "",
+        year ? year : new Date().getFullYear()
+      );
       res.success = true;
       return res;
     } catch (e) {
