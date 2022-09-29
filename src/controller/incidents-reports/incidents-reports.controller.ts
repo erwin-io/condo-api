@@ -92,7 +92,7 @@ export class IncidentsReportsController {
     }
   }
 
-  @Put("updateVisitStatus")
+  @Put("updateStatus")
   //   @UseGuards(JwtAuthGuard)
   async updateStatus(@Body() body: UpdateIncidentReportStatusDto) {
     const res: CustomResponse = {};
