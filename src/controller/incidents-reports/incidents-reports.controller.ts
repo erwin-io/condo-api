@@ -31,11 +31,15 @@ export class IncidentsReportsController {
   ) {}
   @Get()
   // @UseGuards(JwtAuthGuard)
+  @ApiQuery({ name: "tenantId", required: true, allowEmptyValue: false })
   @ApiQuery({ name: "keyword", required: false })
-  async findAll(keyword: string) {
+  async findAll(@Query("tenantId") tenantId, @Query("keyword") keyword) {
     const res: CustomResponse = {};
     try {
-      res.data = await this.incidentsReportsService.find(keyword);
+      res.data = await this.incidentsReportsService.find(
+        tenantId ? tenantId : "",
+        keyword ? keyword : ""
+      );
       res.success = true;
       return res;
     } catch (e) {

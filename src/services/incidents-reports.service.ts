@@ -18,32 +18,35 @@ export class IncidentsReportsService {
     private readonly incidentsReportsRepo: Repository<IncidentsReports>
   ) {}
 
-  async find(keyword: string) {
+  async find(tenantId: string, keyword: string) {
     try {
-      return <IncidentsReportsViewModel[]>(
-        await this.incidentsReportsRepo.manager
-          .createQueryBuilder("IncidentsReports", "ir")
-          //status
-          .leftJoinAndSelect("ir.incidentStatus", "is")
-          //tenant
-          .leftJoinAndSelect("ir.tenant", "t")
-          .leftJoinAndSelect("t.user", "u")
-          .leftJoinAndSelect("t.gender", "g")
-          .leftJoinAndSelect("t.room", "r")
-          .where("ir.incidentsReportId like :keyword")
-          .orWhere("ir.date like :keyword")
-          .orWhere("ir.title like :keyword")
-          .orWhere("ir.message like :keyword")
-          .orWhere("ISNULL(t.firstName, '') like :keyword")
-          .orWhere("ISNULL(t.middleName, '') like :keyword")
-          .orWhere("ISNULL(t.lastName, '') like :keyword")
-          .setParameters({ keyword })
-          .orderBy("ir.incidentStatus", "ASC")
-          .addOrderBy("ir.date", "ASC")
-          .getMany()
-      ).map((ir: IncidentsReports) => {
-        return new IncidentsReportsViewModel(ir);
-      });
+      let query: any = this.incidentsReportsRepo.manager
+        .createQueryBuilder("IncidentsReports", "ir")
+        //status
+        .leftJoinAndSelect("ir.incidentStatus", "is")
+        //tenant
+        .leftJoinAndSelect("ir.tenant", "t")
+        .leftJoinAndSelect("t.user", "u")
+        .leftJoinAndSelect("t.gender", "g")
+        .leftJoinAndSelect("t.room", "r")
+        .where("ir.incidentsReportId like :keyword")
+        .orWhere("ir.date like :keyword")
+        .orWhere("ir.title like :keyword")
+        .orWhere("ir.message like :keyword")
+        .orWhere("ISNULL(t.firstName, '') like :keyword")
+        .orWhere("ISNULL(t.middleName, '') like :keyword")
+        .orWhere("ISNULL(t.lastName, '') like :keyword");
+      query = query
+        .where("t.tenantId = :tenantId")
+        .setParameters({ tenantId, keyword })
+        .orderBy("ir.incidentStatus", "ASC")
+        .addOrderBy("ir.date", "ASC")
+        .getMany();
+      return <IncidentsReportsViewModel[]>(<IncidentsReports[]>await query).map(
+        (ir) => {
+          return new IncidentsReportsViewModel(ir);
+        }
+      );
     } catch (e) {
       throw e;
     }
