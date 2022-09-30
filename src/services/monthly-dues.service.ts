@@ -25,9 +25,30 @@ export class MonthlyDuesService {
     private readonly monthlyDuesRepo: Repository<MonthlyDues>
   ) {}
 
-  async find(tenantId: string, year: number) {
+  async findByTenant(tenantId: string) {
     try {
-      const start = new Date(year, 1, 0);
+      const param = {
+        tenantId,
+      };
+      return <MonthlyDuesViewModel[]>(
+        await this.monthlyDuesRepo.manager
+          .createQueryBuilder("MonthlyDues", "md")
+          .leftJoinAndSelect("md.tenant", "t")
+          .where("t.tenantId = :tenantId")
+          .setParameters(param)
+          .orderBy("md.dueDate", "DESC")
+          .getMany()
+      ).map((md: MonthlyDues) => {
+        return new MonthlyDuesViewModel(md);
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async findByYear(tenantId: string, year: number) {
+    try {
+      const start = new Date(year, 0, 0);
       const lastDay = new Date(year, 12, 0);
 
       const param = {
@@ -47,6 +68,36 @@ export class MonthlyDuesService {
       ).map((md: MonthlyDues) => {
         return new MonthlyDuesViewModel(md);
       });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async summaryByTenant(tenantId: string) {
+    try {
+      const queryTotalDue = await this.monthlyDuesRepo.manager
+        .createQueryBuilder("MonthlyDues", "md")
+        .leftJoinAndSelect("md.tenant", "t")
+        .where("t.tenantId = :tenantId")
+        .select("SUM(md.dueAmount)", "totalDue")
+        .setParameters({ tenantId })
+        .getRawOne();
+      const queryMonthsDue = <MonthlyDues[]>(
+        await this.monthlyDuesRepo.manager
+          .createQueryBuilder("MonthlyDues", "md")
+          .leftJoinAndSelect("md.tenant", "t")
+          .where("md.isPaid = :isPaid")
+          .andWhere("t.tenantId = :tenantId")
+          .setParameters({ isPaid: false, tenantId })
+          .getMany()
+      );
+      const monthsDue = queryMonthsDue.map((x) => {
+        return new MonthlyDuesViewModel(x);
+      });
+      return {
+        ...queryTotalDue,
+        monthsDue,
+      };
     } catch (e) {
       throw e;
     }

@@ -27,14 +27,46 @@ export class MonthlyDuesController {
   @Get()
   // @UseGuards(JwtAuthGuard) 
   @ApiQuery({ name: "tenantId", required: true })
-  @ApiQuery({ name: "year", required: true })
-  async findAll(@Query("tenantId") tenantId, @Query("year") year) {
+  async findAll(@Query("tenantId") tenantId) {
     const res: CustomResponse = {};
     try {
-      res.data = await this.monthlyDuesService.find(
-        tenantId ? tenantId : "",
-        year ? year : new Date().getFullYear()
+      res.data = await this.monthlyDuesService.findByTenant(
+        tenantId ? tenantId : ""
       );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+  @Get("yearly")
+  // @UseGuards(JwtAuthGuard) 
+  @ApiQuery({ name: "tenantId", required: true })
+  @ApiQuery({ name: "year", required: true })
+  async findByYear(@Query("tenantId") tenantId, @Query("year") year) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.monthlyDuesService.findByYear(
+        tenantId ? tenantId : "",
+        year || year < 1753 ? year : new Date().getFullYear()
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get("summary/:tenantId")
+  //   @UseGuards(JwtAuthGuard)
+  async getSummary(@Param("tenantId") tenantId: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.monthlyDuesService.summaryByTenant(tenantId);
       res.success = true;
       return res;
     } catch (e) {
